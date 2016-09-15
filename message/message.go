@@ -2,6 +2,7 @@ package message
 
 import (
 	"github.com/ishail/m-mail/common"
+	"time"
 )
 
 func (msg *Message) ApplySettings(settings []MessageSetting) {
@@ -71,12 +72,11 @@ func (msg *Message) FormatAddress(address, name string) string {
 	enc := msg.encodeString(name)
 	if enc == name {
 		msg.Buff.WriteByte('"')
-		for i := 0; i < len(name); i++ {
-			b := name[i]
-			if b == '\\' || b == '"' {
+		for _, character := range name {
+			if character == '\\' || character == '"' {
 				msg.Buff.WriteByte('\\')
 			}
-			msg.Buff.WriteByte(b)
+			msg.Buff.WriteByte(byte(character))
 		}
 		msg.Buff.WriteByte('"')
 	} else if common.HasSpecials(name) {
@@ -84,6 +84,7 @@ func (msg *Message) FormatAddress(address, name string) string {
 	} else {
 		msg.Buff.WriteString(enc)
 	}
+
 	msg.Buff.WriteString(" <")
 	msg.Buff.WriteString(address)
 	msg.Buff.WriteByte('>')
@@ -91,4 +92,19 @@ func (msg *Message) FormatAddress(address, name string) string {
 	addr := msg.Buff.String()
 	msg.Buff.Reset()
 	return addr
+}
+
+// SetDateHeader sets a date to the given header field.
+func (msg *Message) SetDateHeader(field string, date time.Time) {
+	msg.Header[field] = []string{msg.FormatDate(date)}
+}
+
+// FormatDate formats a date as a valid RFC 5322 date.
+func (msg *Message) FormatDate(date time.Time) string {
+	return date.Format(time.RFC1123Z)
+}
+
+// GetHeader gets a header field.
+func (msg *Message) GetHeader(field string) []string {
+	return msg.Header[field]
 }
