@@ -1,33 +1,28 @@
 package common
 
 import (
-	"bytes"
 	"io"
 	"mime"
 )
 
 type File struct {
 	Name     string
-	Header   map[string][]string
+	Header   Header
 	CopyFunc func(w io.Writer) error
 }
 
+//message header
 type Header map[string][]string
-
-// Message represents an email.
-type Message struct {
-	Header      Header
-	Parts       []*Part
-	Attachments []*File
-	Embedded    []*File
-	Charset     string
-	Encoding    string
-	HEncoder    mime.WordEncoder
-	Buff        bytes.Buffer
-}
 
 type Part struct {
 	ContentType string
 	Copier      func(io.Writer) error
 	Encoding    string
+}
+
+// Encoding represents a MIME encoding scheme like quoted-printable or base64.
+type Encoding string
+
+type MimeEncoder struct {
+	mime.WordEncoder
 }
