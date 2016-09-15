@@ -24,11 +24,12 @@ func SearchString(strArray []string, value string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
 //Add an address to an address array
-func AddAddress(addrArray []string, addr string) []string {
+func AddStrToUniqueList(addrArray []string, addr string) []string {
 	if SearchString(addrArray, addr) {
 		return addrArray
 	}
@@ -36,10 +37,12 @@ func AddAddress(addrArray []string, addr string) []string {
 	return append(addrArray, addr)
 }
 
+//Check for a valid email address
 func ParseAddress(addr string) (string, error) {
 	parsedAddr, err := mail.ParseAddress(addr)
 	if err != nil {
 		return "", fmt.Errorf("m-mail: invalid address %q: %v", addr, err)
 	}
+
 	return parsedAddr.Address, nil
 }

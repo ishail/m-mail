@@ -1,6 +1,7 @@
 package message
 
 import (
+	"errors"
 	"github.com/ishail/m-mail/common"
 	"time"
 )
@@ -107,4 +108,39 @@ func (msg *Message) FormatDate(date time.Time) string {
 // GetHeader gets a header field.
 func (msg *Message) GetHeader(field string) []string {
 	return msg.Header[field]
+}
+
+//Get From address from Message model
+func (msg *Message) GetFrom() (string, error) {
+	if from, ok := msg.Header["From"]; ok {
+		if len(from) > 0 {
+			return common.ParseAddress(from[0])
+		}
+	}
+	return "", errors.New("m-mail: invalid message, 'From' field is missing!")
+}
+
+//Get list of recipients(To, Cc, Bcc) from Message object
+func (msg *Message) GetRecipients() ([]string, error) {
+	recipientLength := 0
+	for _, field := range []string{"To", "Cc", "Bcc"} {
+		if addresses, ok := msg.Header[field]; ok {
+			recipientLength += len(addresses)
+		}
+	}
+	recipients := make([]string, recipientLength)
+
+	for _, field := range []string{"To", "Cc", "Bcc"} {
+		if addresses, ok := msg.Header[field]; ok {
+			for _, a := range addresses {
+				if addr, err := common.ParseAddress(a); err != nil {
+					return nil, err
+				} else {
+					recipients = common.AddStrToUniqueList(recipients, addr)
+				}
+			}
+		}
+	}
+
+	return recipients, nil
 }
