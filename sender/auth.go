@@ -1,4 +1,4 @@
-package authentication
+package sender
 
 import (
 	"bytes"

@@ -46,3 +46,7 @@ func ParseAddress(addr string) (string, error) {
 
 	return parsedAddr.Address, nil
 }
+
+func HostPortAddr(host string, port int) string {
+	return fmt.Sprintf("%s:%d", host, port)
+}
