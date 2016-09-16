@@ -1,4 +1,4 @@
-Thank you for contributing to Gomail! Here are a few guidelines:
+Thank you for contributing to m-mail! Here are a few guidelines:
 
 ## Bugs
 
@@ -14,7 +14,7 @@ new test or update an existing one to cover that bug.
 
 ## New feature proposal
 
-If you think Gomail lacks a feature, you can open an issue or send a pull
-request. I want to keep Gomail code and API as simple as possible so please
+If you think m-mail lacks a feature, you can open an issue or send a pull
+request. I want to keep m-mail code and API as simple as possible so please
 describe your needs so we can discuss whether this feature should be added to
-Gomail or not.
+m-mail or not.
