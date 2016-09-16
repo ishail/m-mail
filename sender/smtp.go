@@ -3,6 +3,7 @@ package sender
 import (
 	"crypto/tls"
 	"github.com/ishail/m-mail/common"
+	"github.com/ishail/m-mail/message"
 	"net"
 	"net/smtp"
 	"strings"
@@ -23,7 +24,7 @@ func NewDialer(host string, port int, username, password string) *Dialer {
 
 // Dial dials and authenticates to an SMTP server. The returned SendCloser
 // should be closed when done using it.
-func (dialer *Dialer) Dial() (common.SendCloser, error) {
+func (dialer *Dialer) Dial() (SendCloser, error) {
 	conn, err := net.DialTimeout("tcp", common.HostPortAddr(dialer.Host, dialer.Port),
 		10*time.Second)
 	if err != nil {
@@ -88,6 +89,6 @@ func (dialer *Dialer) tlsConfig() *tls.Config {
 	return dialer.TLSConfig
 }
 
-func (sender *smtpSender) Send(from string, to []string, msg []byte) error {
+func (sender *smtpSender) Send(msg *message.Message) error {
 	return nil
 }

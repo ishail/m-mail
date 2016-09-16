@@ -2,6 +2,7 @@ package sender
 
 import (
 	"crypto/tls"
+	"github.com/ishail/m-mail/message"
 	"net/smtp"
 )
 
@@ -35,6 +36,18 @@ type Dialer struct {
 	// LocalName is the hostname sent to the SMTP server with the HELO command.
 	// By default, "localhost" is sent.
 	LocalName string
+}
+
+// Sender is the interface that wraps the Send method.
+// Send sends an email to the given addresses.
+type Sender interface {
+	Send(msg *message.Message) error
+}
+
+// SendCloser is the interface that groups the Send and Close methods.
+type SendCloser interface {
+	Sender
+	Close() error
 }
 
 type smtpSender struct {

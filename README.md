@@ -3,7 +3,8 @@
 ## Introduction
 
 m-mail is havily inspired from [Gomail](https://github.com/go-gomail/gomail). I really tried to
-build over what the author of gomail did with little more structured codebase.
+build over what the author of gomail did with little more structured codebase and some public
+function signatures.
 
 m-mail can be used to send emails using an SMTP server or with API server (having support for some
 popular email vendors.)
