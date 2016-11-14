@@ -1,7 +1,9 @@
 package message
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"github.com/ishail/m-mail/common"
 	"time"
 )
@@ -21,20 +23,6 @@ func (msg *Message) Reset() {
 	msg.Parts = nil
 	msg.Attachments = nil
 	msg.Embedded = nil
-}
-
-// SetCharset is a message setting to set the charset of the email.
-func SetCharset(charset string) MessageSetting {
-	return func(msg *Message) {
-		msg.Charset = charset
-	}
-}
-
-// SetEncoding is a message setting to set the encoding of the email.
-func SetEncoding(enc common.Encoding) MessageSetting {
-	return func(msg *Message) {
-		msg.Encoding = enc
-	}
 }
 
 func (msg *Message) SetHeader(field string, value ...string) {
@@ -97,12 +85,7 @@ func (msg *Message) FormatAddress(address, name string) string {
 
 // SetDateHeader sets a date to the given header field.
 func (msg *Message) SetDateHeader(field string, date time.Time) {
-	msg.Header[field] = []string{msg.FormatDate(date)}
-}
-
-// FormatDate formats a date as a valid RFC 5322 date.
-func (msg *Message) FormatDate(date time.Time) string {
-	return date.Format(time.RFC1123Z)
+	msg.Header[field] = []string{common.FormatDate(date)}
 }
 
 // GetHeader gets a header field.
@@ -132,9 +115,10 @@ func (msg *Message) GetRecipients() ([]string, error) {
 
 	for _, field := range []string{"To", "Cc", "Bcc"} {
 		if addresses, ok := msg.Header[field]; ok {
-			for _, a := range addresses {
-				if addr, err := common.ParseAddress(a); err != nil {
-					return nil, err
+			for _, addr := range addresses {
+				if addr, err := common.ParseAddress(addr); err != nil {
+					return nil, fmt.Errorf(
+						"m-mail: Unable to parse address. Address: %s, Error: %v", addr, err)
 				} else {
 					recipients = common.AddStrToUniqueList(recipients, addr)
 				}
@@ -143,4 +127,30 @@ func (msg *Message) GetRecipients() ([]string, error) {
 	}
 
 	return recipients, nil
+}
+
+//Convert Message object into bytes
+func (msg *Message) GetEmailBytes() ([]byte, error) {
+	var msgBytes bytes.Buffer
+	if _, ok := msg.Header["Mime-Version"]; !ok {
+		msgBytes.WriteString("Mime-Version: 1.0\r\n")
+	}
+
+	if _, ok := msg.Header["Date"]; !ok {
+		msg.SetDateHeader("Date", time.Now())
+	}
+
+	msgBytes.Write(msg.getHeadersBytes())
+
+	return msgBytes.Bytes(), nil
+}
+
+//Returns headers of message as RFC format
+func (msg *Message) getHeadersBytes() []byte {
+	var headers bytes.Buffer
+	for key, value := range msg.Header {
+		headers.Write(getHeaderBytes(key, value...))
+	}
+
+	return headers.Bytes()
 }

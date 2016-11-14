@@ -90,5 +90,20 @@ func (dialer *Dialer) tlsConfig() *tls.Config {
 }
 
 func (sender *smtpSender) Send(msg *message.Message) error {
+	from, err := msg.GetFrom()
+	if err != nil {
+		return err
+	}
+
+	to, err := msg.GetRecipients()
+	if err != nil {
+		return err
+	}
+
+	msgByte, err := msg.GetEmailBytes()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

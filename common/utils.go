@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"net/mail"
+	"time"
 )
 
 //Checks whether string has special characters
@@ -47,6 +48,12 @@ func ParseAddress(addr string) (string, error) {
 	return parsedAddr.Address, nil
 }
 
+//Return formated address for host and port
 func HostPortAddr(host string, port int) string {
 	return fmt.Sprintf("%s:%d", host, port)
+}
+
+// FormatDate formats a date as a valid RFC 5322 date.
+func FormatDate(date time.Time) string {
+	return date.Format(time.RFC1123Z)
 }
