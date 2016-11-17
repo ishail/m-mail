@@ -5,7 +5,7 @@ import (
 	"github.com/ishail/m-mail/common"
 	"github.com/ishail/m-mail/message"
 	"github.com/ishail/m-mail/sender"
-	"net/smtp"
+	"github.com/ishail/smtp/smtp"
 )
 
 //Creates a Message object with optional MessageSetting
@@ -63,11 +63,16 @@ func DialAndSend(dialer *sender.Dialer, messages ...*message.Message) error {
 }
 
 // Temporary function to send mail. To be scrapped.
-func SendMail(auth *smtp.Auth, to, from string, msg *message.Message, host string, port int) error {
-	return smtp.SendMail(
+func SendMail(auth *smtp.Auth, to, from string, msg *message.Message, host string, port int) (string, error) {
+	_, resp, err := smtp.SendMail(
 		common.HostPortAddr(host, port),
 		*auth,
 		from,
 		[]string{to},
 		msg.GetEmailBytes(to))
+	return resp, err
+}
+
+func PlainAuth(username, password, host string) smtp.Auth {
+	return smtp.PlainAuth("", username, password, host)
 }
