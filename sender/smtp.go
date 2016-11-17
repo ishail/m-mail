@@ -2,12 +2,14 @@ package sender
 
 import (
 	"crypto/tls"
+	"fmt"
 	"github.com/ishail/m-mail/common"
 	"github.com/ishail/m-mail/message"
+	"io"
 	"net"
 	"net/smtp"
 	"strings"
-	"time"
+	// "time"
 )
 
 // NewDialer returns a new SMTP Dialer. The given parameters are used to connect
@@ -25,8 +27,9 @@ func NewDialer(host string, port int, username, password string) *Dialer {
 // Dial dials and authenticates to an SMTP server. The returned SendCloser
 // should be closed when done using it.
 func (dialer *Dialer) Dial() (SendCloser, error) {
-	conn, err := net.DialTimeout("tcp", common.HostPortAddr(dialer.Host, dialer.Port),
-		10*time.Second)
+	// conn, err := net.DialTimeout("tcp", common.HostPortAddr(dialer.Host, dialer.Port),
+	// 	10*time.Second)
+	conn, err := net.Dial("tcp", common.HostPortAddr(dialer.Host, dialer.Port))
 	if err != nil {
 		return nil, err
 	}
@@ -89,21 +92,64 @@ func (dialer *Dialer) tlsConfig() *tls.Config {
 	return dialer.TLSConfig
 }
 
-func (sender *smtpSender) Send(msg *message.Message) error {
+// Close closes the connection.
+func (c *smtpSender) Close() error {
+	return c.Text.Close()
+}
+
+func (sender *smtpSender) Send(msg *message.Message) (string, error) {
+	defer sender.Close()
 	from, err := msg.GetFrom()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	to, err := msg.GetRecipients()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	msgByte, err := msg.GetEmailBytes()
-	if err != nil {
-		return err
+	for _, addr := range to {
+		msgByte := msg.GetEmailBytes(addr)
+
+		if err := sender.Mail(from); err != nil {
+			if err == io.EOF {
+				// This is probably due to a timeout, so reconnect and try again.
+				if sc, err := sender.d.Dial(); err != nil {
+					return "", fmt.Errorf("m-mail: unable to Dial! Error: %s", err.Error())
+				} else {
+					if s, ok := sc.(*smtpSender); ok {
+						*sender = *s
+					}
+				}
+			}
+		}
+
+		if err := sender.Rcpt(addr); err != nil {
+			return "", err
+		}
+
+		w, err := sender.Data()
+		if err != nil {
+			return "", err
+		}
+
+		if _, err = w.Write(msgByte); err != nil {
+			return "", err
+		}
+
+		if err = w.Close(); err != nil {
+			return "", err
+		}
+
+		// code, resp, err := sender.Text.ReadResponse(250)
+		// if err != nil {
+		// 	return "", err
+		// }
+
+		// return fmt.Sprintf("%d %s", code, resp), sender.Quit()
+		return "", sender.Quit()
 	}
 
-	return nil
+	return "", fmt.Errorf("Whoa!!....It should not come.")
 }

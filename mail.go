@@ -5,11 +5,21 @@ import (
 	"github.com/ishail/m-mail/common"
 	"github.com/ishail/m-mail/message"
 	"github.com/ishail/m-mail/sender"
+	"net/smtp"
 )
 
 //Creates a Message object with optional MessageSetting
-func NewMessage(settings ...message.MessageSetting) *message.Message {
+func NewMessage(subject, body, emailType string, settings ...message.MessageSetting) *message.Message {
+	if emailType == "html" || emailType == "text/html" {
+		emailType = "text/html"
+	} else {
+		emailType = "text/plain"
+	}
+
 	msg := &message.Message{
+		Subject:  subject,
+		Body:     body,
+		Type:     emailType,
 		Header:   make(common.Header),
 		Charset:  "UTF-8",
 		Encoding: common.QuotedPrintable,
@@ -42,10 +52,22 @@ func DialAndSend(dialer *sender.Dialer, messages ...*message.Message) error {
 	defer sendCloser.Close()
 
 	for index, msg := range messages {
-		if err = sendCloser.Send(msg); err != nil {
-			return fmt.Errorf("m-mail: could not send email %d: %v", index+1, err)
+		if resp, err := sendCloser.Send(msg); err != nil {
+			fmt.Printf("m-mail: could not send email %d: %v", index+1, err)
+		} else {
+			fmt.Println("response....", resp)
 		}
 	}
 
 	return nil
+}
+
+// Temporary function to send mail. To be scrapped.
+func SendMail(auth *smtp.Auth, to, from string, msg *message.Message, host string, port int) error {
+	return smtp.SendMail(
+		common.HostPortAddr(host, port),
+		*auth,
+		from,
+		[]string{to},
+		msg.GetEmailBytes(to))
 }

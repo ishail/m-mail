@@ -41,7 +41,7 @@ type Dialer struct {
 // Sender is the interface that wraps the Send method.
 // Send sends an email to the given addresses.
 type Sender interface {
-	Send(msg *message.Message) error
+	Send(msg *message.Message) (string, error)
 }
 
 // SendCloser is the interface that groups the Send and Close methods.

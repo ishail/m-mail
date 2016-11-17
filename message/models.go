@@ -7,6 +7,9 @@ import (
 
 // Message represents an email.
 type Message struct {
+	Subject     string
+	Body        string
+	Type        string
 	Header      common.Header
 	Parts       []*common.Part
 	Attachments []*common.File

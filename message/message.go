@@ -106,21 +106,25 @@ func (msg *Message) GetFrom() (string, error) {
 //Get list of recipients(To, Cc, Bcc) from Message object
 func (msg *Message) GetRecipients() ([]string, error) {
 	recipientLength := 0
-	for _, field := range []string{"To", "Cc", "Bcc"} {
+	addrHeaderList := []string{"To", "Cc", "Bcc"}
+
+	for _, field := range addrHeaderList {
 		if addresses, ok := msg.Header[field]; ok {
 			recipientLength += len(addresses)
 		}
 	}
 	recipients := make([]string, recipientLength)
+	index := 0
 
-	for _, field := range []string{"To", "Cc", "Bcc"} {
+	for _, field := range addrHeaderList {
 		if addresses, ok := msg.Header[field]; ok {
 			for _, addr := range addresses {
 				if addr, err := common.ParseAddress(addr); err != nil {
 					return nil, fmt.Errorf(
 						"m-mail: Unable to parse address. Address: %s, Error: %v", addr, err)
 				} else {
-					recipients = common.AddStrToUniqueList(recipients, addr)
+					recipients[index] = addr
+					index++
 				}
 			}
 		}
@@ -130,19 +134,21 @@ func (msg *Message) GetRecipients() ([]string, error) {
 }
 
 //Convert Message object into bytes
-func (msg *Message) GetEmailBytes() ([]byte, error) {
+func (msg *Message) GetEmailBytes(to string) []byte {
 	var msgBytes bytes.Buffer
-	if _, ok := msg.Header["Mime-Version"]; !ok {
-		msgBytes.WriteString("Mime-Version: 1.0\r\n")
-	}
 
-	if _, ok := msg.Header["Date"]; !ok {
-		msg.SetDateHeader("Date", time.Now())
-	}
+	msgBytes.WriteString("To: " + to + "\r\n")
+	msgBytes.WriteString("Date: " + time.Now().String() + "\r\n")
+	msgBytes.WriteString("Subject: " + msg.Subject + "\r\n")
+	msgBytes.WriteString("Content-Type: multipart/alternative;\r\n")
+	msgBytes.WriteString(`    boundary="boundary-type-1234567892-alt"` + "\r\n")
+	msgBytes.WriteString("Mime-Version: 1.0\r\n\r\n")
+	msgBytes.WriteString("--boundary-type-1234567892-alt\r\n")
+	msgBytes.WriteString("Content-Type: " + msg.Type + `; charset="UTF-8"` + "\r\n")
+	msgBytes.WriteString("Content-Transfer-Encoding: quoted-printable\r\n\r\n")
+	msgBytes.WriteString(msg.Body)
 
-	msgBytes.Write(msg.getHeadersBytes())
-
-	return msgBytes.Bytes(), nil
+	return msgBytes.Bytes()
 }
 
 //Returns headers of message as RFC format
