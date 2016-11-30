@@ -3,13 +3,13 @@ package sender
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/ishail/m-mail/common"
-	"github.com/ishail/m-mail/message"
 	"io"
 	"net"
-	"net/smtp"
 	"strings"
-	// "time"
+
+	"github.com/ishail/m-mail/common"
+	"github.com/ishail/m-mail/message"
+	"github.com/ishail/smtp/smtp"
 )
 
 // NewDialer returns a new SMTP Dialer. The given parameters are used to connect
@@ -129,7 +129,7 @@ func (sender *smtpSender) Send(msg *message.Message) (string, error) {
 			return "", err
 		}
 
-		w, err := sender.Data()
+		w, _, _, err := sender.Data()
 		if err != nil {
 			return "", err
 		}

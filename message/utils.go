@@ -2,6 +2,7 @@ package message
 
 import (
 	"bytes"
+
 	"github.com/ishail/m-mail/common"
 )
 

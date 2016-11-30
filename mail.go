@@ -2,6 +2,7 @@ package mail
 
 import (
 	"fmt"
+
 	"github.com/ishail/m-mail/common"
 	"github.com/ishail/m-mail/message"
 	"github.com/ishail/m-mail/sender"

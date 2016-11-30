@@ -4,8 +4,9 @@ import (
 	"mime"
 	"mime/quotedprintable"
 	"net"
-	"net/smtp"
 	"strings"
+
+	"github.com/ishail/smtp/smtp"
 )
 
 var (

@@ -2,8 +2,9 @@ package sender
 
 import (
 	"crypto/tls"
+
 	"github.com/ishail/m-mail/message"
-	"net/smtp"
+	"github.com/ishail/smtp/smtp"
 )
 
 // loginAuth is an smtp.Auth that implements the LOGIN authentication mechanism.

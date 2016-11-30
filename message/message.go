@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/ishail/m-mail/common"
 	"time"
+
+	"github.com/ishail/m-mail/common"
 )
 
 func (msg *Message) ApplySettings(settings []MessageSetting) {

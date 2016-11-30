@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"net/smtp"
+
+	"github.com/ishail/smtp/smtp"
 )
 
 func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
