@@ -145,7 +145,7 @@ func (msg *Message) GetEmailBytes(to string) []byte {
 	msgBytes.WriteString(`    boundary="boundary-type-1234567892-alt"` + "\r\n")
 	msgBytes.WriteString("Mime-Version: 1.0\r\n\r\n")
 	msgBytes.WriteString("--boundary-type-1234567892-alt\r\n")
-	msgBytes.WriteString("Content-Type: " + msg.Type + `; charset="UTF-8"` + "\r\n")
+	msgBytes.WriteString("Content-Type: " + msg.Type + `; charset=UTF-8` + "\r\n")
 	msgBytes.WriteString("Content-Transfer-Encoding: quoted-printable\r\n\r\n")
 	msgBytes.WriteString(msg.Body + "\r\n")
 
