@@ -1,3 +1,6 @@
+/*
+	Package common contains functions, structures, constants to be used across m-mail.
+*/
 package common
 
 const (

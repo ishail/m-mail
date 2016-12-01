@@ -1,3 +1,6 @@
+/*
+	Package sender handles authentication and interaction with server.
+*/
 package sender
 
 import (
@@ -151,5 +154,5 @@ func (sender *smtpSender) Send(msg *message.Message) (string, error) {
 		return "", sender.Quit()
 	}
 
-	return "", fmt.Errorf("Whoa!!....It should not come.")
+	return "", fmt.Errorf("Whoa!!....It should not come. Looks like recipient address are empty!")
 }

@@ -21,6 +21,5 @@ type Message struct {
 	Buff        bytes.Buffer
 }
 
-// A MessageSetting can be used as an argument in NewMessage to configure an
-// email.
+// A MessageSetting can be used as an argument in NewMessage to configure an email.
 type MessageSetting func(m *Message)

@@ -1,3 +1,6 @@
+/*
+	Package message contains Message structure and implements every method on it.
+*/
 package message
 
 import (

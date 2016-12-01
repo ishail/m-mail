@@ -1,3 +1,6 @@
+/*
+	Package mail exposes functions to create Message object and send them.
+*/
 package mail
 
 import (
