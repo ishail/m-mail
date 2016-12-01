@@ -43,7 +43,7 @@ func DialAndSend(dialer *sender.Dialer, messages ...*message.Message) error {
 	return nil
 }
 
-// Temporary function to send mail. To be scrapped.
+// SendMail is a temporary function to send mail. To be scrapped.
 func SendMail(auth *smtp.Auth, to, from string, msg *message.Message, host string, port int) (string, error) {
 	_, resp, err := smtp.SendMail(
 		common.HostPortAddr(host, port),
@@ -54,7 +54,7 @@ func SendMail(auth *smtp.Auth, to, from string, msg *message.Message, host strin
 	return resp, err
 }
 
-// Returns a plain smtp.auth object.
+// PlainAuth returns a plain smtp.auth object.
 func PlainAuth(username, password, host string) smtp.Auth {
 	return smtp.PlainAuth("", username, password, host)
 }
