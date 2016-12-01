@@ -9,14 +9,14 @@ import (
 // SetCharset is a message setting to set the charset of the email.
 func SetCharset(charset string) MessageSetting {
 	return func(msg *Message) {
-		msg.Charset = charset
+		msg.charset = charset
 	}
 }
 
 // SetEncoding is a message setting to set the encoding of the email.
 func SetEncoding(enc common.Encoding) MessageSetting {
 	return func(msg *Message) {
-		msg.Encoding = enc
+		msg.encoding = enc
 	}
 }
 

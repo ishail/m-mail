@@ -8,17 +8,17 @@ import (
 
 // Message represents an email.
 type Message struct {
-	Subject     string
-	Body        string
-	Type        string
-	Header      common.Header
-	Parts       []*common.Part
-	Attachments []*common.File
-	Embedded    []*common.File
-	Charset     string
-	Encoding    common.Encoding
-	HEncoder    common.MimeEncoder
-	Buff        bytes.Buffer
+	subject     string
+	body        string
+	emailType   string
+	header      common.Header
+	parts       []*common.Part
+	attachments []*common.File
+	embedded    []*common.File
+	charset     string
+	encoding    common.Encoding
+	hEncoder    common.MimeEncoder
+	buff        bytes.Buffer
 }
 
 // A MessageSetting can be used as an argument in NewMessage to configure an email.

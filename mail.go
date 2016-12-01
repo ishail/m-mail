@@ -12,42 +12,19 @@ import (
 	"github.com/ishail/smtp/smtp"
 )
 
-//Creates a Message object with optional MessageSetting
+// NewMessage creates a Message object with optional MessageSetting.
 func NewMessage(subject, body, emailType string, settings ...message.MessageSetting) *message.Message {
-	if emailType == "html" || emailType == "text/html" {
-		emailType = "text/html"
-	} else {
-		emailType = "text/plain"
-	}
-
-	msg := &message.Message{
-		Subject:  subject,
-		Body:     body,
-		Type:     emailType,
-		Header:   make(common.Header),
-		Charset:  "UTF-8",
-		Encoding: common.QuotedPrintable,
-	}
-
-	msg.ApplySettings(settings)
-
-	if msg.Encoding == common.Base64 {
-		msg.HEncoder = common.BEncoding
-	} else {
-		msg.HEncoder = common.QEncoding
-	}
-
-	return msg
+	return message.NewMessage(subject, body, emailType, settings...)
 }
 
-// NewPlainDialer returns a new SMTP Dialer. The given parameters are used to
-// connect to the SMTP server.
+// NewPlainDialer returns a new SMTP Dialer. The given parameters are used to connect to the SMTP
+// server.
 func NewPlainDialer(host string, port int, username, password string) *sender.Dialer {
 	return sender.NewDialer(host, port, username, password)
 }
 
-// DialAndSend opens a connection to the SMTP server, sends the given emails and
-// closes the connection
+// DialAndSend opens a connection to the SMTP server, sends the given emails and closes the
+// connection.
 func DialAndSend(dialer *sender.Dialer, messages ...*message.Message) error {
 	sendCloser, err := dialer.Dial()
 	if err != nil {
@@ -77,6 +54,7 @@ func SendMail(auth *smtp.Auth, to, from string, msg *message.Message, host strin
 	return resp, err
 }
 
+// Returns a plain smtp.auth object.
 func PlainAuth(username, password, host string) smtp.Auth {
 	return smtp.PlainAuth("", username, password, host)
 }
