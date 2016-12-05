@@ -46,6 +46,10 @@ func (msg *Message) ApplySettings(settings []MessageSetting) {
 	}
 }
 
+func (msg *Message) AddTrackingUrl(url string) {
+	msg.trackingUrl = url
+}
+
 // Reset resets the message so it can be reused. The message keeps its previous
 // settings so it is in the same state that after a call to NewMessage.
 func (msg *Message) Reset() {
@@ -169,18 +173,37 @@ func (msg *Message) GetRecipients() ([]string, error) {
 func (msg *Message) GetEmailBytes(to string) []byte {
 	var msgBytes bytes.Buffer
 
+	msgBytes.WriteString("Mime-Version: 1.0\r\n")
 	msgBytes.WriteString("To: " + to + "\r\n")
 	msgBytes.WriteString("Date: " + time.Now().String() + "\r\n")
 	msgBytes.WriteString("Subject: " + msg.subject + "\r\n")
-	// msgBytes.WriteString("Content-Type: multipart/alternative;\r\n")
-	// msgBytes.WriteString(`    boundary="boundary-type-1234567892-alt"` + "\r\n")
-	// msgBytes.WriteString("Mime-Version: 1.0\r\n\r\n")
-	// msgBytes.WriteString("--boundary-type-1234567892-alt\r\n")
+	msgBytes.WriteString("Content-Type: multipart/alternative; boundary=boundary-type-1234567892-alt\r\n\r\n")
+	msgBytes.WriteString("--boundary-type-1234567892-alt\r\n")
 	msgBytes.WriteString("Content-Type: " + msg.emailType + `; charset=` + msg.charset + "\r\n")
-	msgBytes.WriteString("Content-Transfer-Encoding: quoted-printable\r\n\r\n")
-
 	w := quotedprintable.NewWriter(&msgBytes)
-	w.Write([]byte(msg.body))
+	if msg.emailType == "text/html" {
+		msgBytes.WriteString("Content-Transfer-Encoding: quoted-printable\r\n\r\n")
+		w.Write([]byte(msg.body))
+		w.Close()
+	} else {
+		msgBytes.WriteString(msg.body + "\r\n")
+	}
+
+	if msg.trackingUrl != "" {
+		msgBytes.WriteString("\r\n\r\n")
+
+		if msg.emailType == "text/plain" {
+			msgBytes.WriteString("--boundary-type-1234567892-alt\r\n")
+			msgBytes.WriteString("Content-Type: text/html; charset=UTF-8\r\n")
+			msgBytes.WriteString("Content-Transfer-Encoding: quoted-printable\r\n\r\n")
+			w.Write([]byte(`<div dir="ltr">` + msg.body))
+		} else {
+			w.Write([]byte(`<div>`))
+		}
+
+		w.Write([]byte(`<img src="` + msg.trackingUrl + `" style="display:none!important" height="1" width="1"></div>`))
+		w.Close()
+	}
 
 	// if _, ok := msg.header["Mime-Version"]; !ok {
 	// 	msgBytes.WriteString("Mime-Version: 1.0\r\n")

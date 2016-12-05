@@ -19,6 +19,7 @@ type Message struct {
 	encoding    common.Encoding
 	hEncoder    common.MimeEncoder
 	buff        bytes.Buffer
+	trackingUrl string
 }
 
 // A MessageSetting can be used as an argument in NewMessage to configure an email.
